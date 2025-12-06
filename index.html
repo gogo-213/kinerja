@@ -10,7 +10,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <style>
-/* --- KODE CSS LENGKAP --- */
+/* --- KODE CSS LENGKAP (TIDAK BERUBAH DARI VERSI LAMA) --- */
     body { 
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
         background-color: #f4f7f6; 
@@ -460,7 +460,7 @@
 </div>
 
 <script>
-// --- Pemeriksaan Status Login ---
+// --- Pemeriksaan Status Login (Hanya Admin) ---
 const LOGIN_PAGE_URL = 'login.html'; 
 
 if (localStorage.getItem('isAdminLoggedIn') !== 'true') {
@@ -470,6 +470,7 @@ if (localStorage.getItem('isAdminLoggedIn') !== 'true') {
 function logout() {
     if (confirm('Anda yakin ingin keluar dari aplikasi?')) {
         localStorage.removeItem('isAdminLoggedIn');
+        localStorage.removeItem('isUserLoggedIn');
         window.location.href = LOGIN_PAGE_URL;
     }
 }
@@ -1026,7 +1027,7 @@ function render(){
     renderTable();
 }
 
-// --- FUNGSI EXPORT (Diperbarui dengan peringatan yang lebih informatif) ---
+// --- FUNGSI EXPORT ---
 
 function workbookToS2ab(workbook) {
     const wopts = { bookType: 'xlsx', bookSST: false, type: 'binary' };
