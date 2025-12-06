@@ -3,232 +3,1126 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Login - Aplikasi Penilaian Kinerja</title>
+<title>Aplikasi Penilaian Kinerja Pegawai BP2JK DIY</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <style>
-/* --- CSS LOGIN --- */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); 
-    color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-}
-.login-container {
-    background-color: #ffffff;
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    max-width: 400px; 
-    text-align: center;
-}
-.login-header {
-    margin-bottom: 30px;
-}
-.login-header h2 {
-    color: #007bff;
-    margin: 0;
-    font-size: 2em;
-}
-.login-header p {
-    color: #555;
-    margin-top: 5px;
-    font-size: 1em;
-}
-.input-group {
-    margin-bottom: 20px;
-    text-align: left;
-}
-.input-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #555;
-}
-.input-group input[type="text"],
-.input-group input[type="password"] {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    box-sizing: border-box;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-.input-group input:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-    outline: none;
-}
-#loginAdminButton, #loginUserButton {
-    width: 100%;
-    padding: 14px;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 1.1em;
-    font-weight: bold;
-    transition: background-color 0.3s;
-    margin-top: 10px;
-}
-#loginAdminButton {
-    background-color: #007bff; 
-}
-#loginAdminButton:hover {
-    background-color: #0056b3;
-}
-#loginUserButton {
-    background-color: #28a745; 
-}
-#loginUserButton:hover {
-    background-color: #1e7e34;
-}
-#loginAdminButton:disabled, #loginUserButton:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-#message {
-    margin-top: 15px;
-    color: #dc3545;
-    font-weight: 600;
-    min-height: 20px;
-}
-.login-footer {
-    margin-top: 30px;
-    color: #888;
-    font-size: 0.85em;
-}
-/* --- AKHIR CSS LOGIN --- */
+/* --- KODE CSS LENGKAP (TIDAK BERUBAH DARI VERSI LAMA) --- */
+    body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        background-color: #f4f7f6; 
+        color: #333;
+        padding: 40px 20px; 
+    }
+    .app-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between; 
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #007bff;
+    }
+    .header-content {
+        display: flex;
+        align-items: center;
+    }
+    .app-logo {
+        width: 80px; 
+        height: 80px;
+        margin-right: 20px;
+        border-radius: 50%;
+        object-fit: contain;
+        display: block; 
+    }
+    .app-header-text h2 { 
+        color: #007bff; 
+        margin: 0;
+        font-size: 1.8em;
+    }
+    .app-header-text p {
+        margin: 0;
+        color: #555;
+        font-size: 1.1em;
+    }
+    h3 { 
+        color: #007bff; 
+        border-bottom: 2px solid #e0e0e0; 
+        padding-bottom: 5px;
+        margin-top: 30px;
+    }
+    .container {
+        max-width: 1200px; 
+        margin: 0 auto;
+        background-color: #ffffff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .input-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        padding: 20px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        margin-bottom: 30px;
+    }
+    #addEmployeeForm {
+        grid-template-columns: 1fr auto; 
+        border: 1px solid #ffc107;
+        background-color: #fff9e6;
+        margin-top: 15px;
+        align-items: end;
+    }
+    #scoreForm {
+        margin-top: 30px;
+        border: 1px solid #007bff;
+        background-color: #f8faff;
+    }
+    .name-input-group {
+        display: flex;
+        flex-direction: column;
+    }
+    .name-input-group > * {
+        margin-top: 5px;
+        width: 100%;
+    }
+    #empNameInput { display: none; }
+    #empNameSelect { display: block; }
+    label { 
+        display: block; 
+        margin-top: 5px; 
+        font-weight: 600;
+        color: #555;
+    }
+    input[type="text"], 
+    input[type="number"], 
+    select { 
+        width: 100%;
+        padding: 10px; 
+        margin-top: 5px; 
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    .weight-section {
+        grid-column: 1 / -1; 
+        margin-top: 10px;
+        padding: 15px;
+        background-color: #e9f5ff;
+        border-radius: 4px;
+    }
+    .weight-section h3 {
+        margin-top: 0;
+        border-bottom: none;
+        color: #0056b3;
+    }
+    .weight-section label {
+        display: inline-block;
+        width: calc(20% - 5px); 
+        margin-right: 0;
+        font-size: 0.9em;
+        font-weight: normal;
+    }
+    .weight-section input {
+        width: 40px; 
+        text-align: center;
+        background-color: #f0f8ff;
+        border: 1px dashed #a0c3e1;
+        cursor: default;
+        display: inline-block;
+        padding: 5px;
+        margin-left: 5px;
+    }
+    .form-actions {
+        grid-column: 1 / -1;
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    button {
+        padding: 12px 25px;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1.0em;
+        transition: background-color 0.3s;
+    }
+    .logout-btn {
+        background-color: #dc3545;
+        padding: 10px 15px;
+        font-size: 0.9em;
+    }
+    .logout-btn:hover { background-color: #c82333; }
+    #addEmployeeButton {
+        background-color: #ffc107;
+        color: #333;
+        padding: 10px 25px;
+        height: 40px;
+    }
+    #addEmployeeButton:hover { background-color: #e0a800; }
+    #saveButton { background-color: #28a745; }
+    #saveButton:hover { background-color: #1e7e34; }
+    #cancelButton { background-color: #6c757d; display: none; }
+    #cancelButton:hover { background-color: #5a6268; }
+    .action-button {
+        padding: 5px 10px;
+        font-size: 0.9em;
+        margin-right: 5px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+    }
+    .edit-btn { background-color: #ffc107; color: #333; }
+    .edit-btn:hover { background-color: #e0a800; }
+    .delete-btn { background-color: #dc3545; color: white; }
+    .delete-btn:hover { background-color: #c82333; }
+    .chart-dashboard {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    .chart-box {
+        flex: 1;
+        min-width: 300px;
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .chart-box h4 {
+        text-align: center;
+        color: #007bff;
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+    .action-row {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-bottom: 15px; 
+        flex-wrap: wrap;
+    }
+    .action-row .action-button {
+        padding: 10px 15px;
+        font-size: 0.9em;
+        margin-right: 0;
+    }
+    .pdf-btn { background-color: #dc3545; color: white; }
+    .export-btn { background-color: #4CAF50; color: white; }
+    .print-btn { background-color: #3f51b5; color: white; }
+    #searchForm {
+        display: flex;
+        gap: 15px;
+        padding: 15px;
+        background-color: #f0f0f0;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+    #searchButton {
+        padding: 10px 20px;
+        background-color: #007bff;
+        height: 40px;
+    }
+    #searchButton:hover {
+        background-color: #0056b3;
+    }
+    #searchForm select, #searchForm input {
+        height: 40px;
+        margin: 0;
+    }
+    table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        margin-top: 5px; 
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        border-radius: 6px;
+        overflow: hidden;
+        font-size: 0.95em;
+    }
+    th, td { 
+        border: 1px solid #ddd; 
+        padding: 10px 8px;
+        text-align: left; 
+    }
+    thead tr { background-color: #007bff; color: white; }
+    tbody tr:nth-child(even) { background-color: #f9f9f9; }
+    tbody tr:hover { background-color: #f1f1f1; }
+    th:nth-child(1), td:nth-child(1) { width: 5%; text-align: center; } 
+    th:nth-child(6), td:nth-child(6) { text-align: right; font-weight: 500; } 
+    th:nth-child(7), td:nth-child(7) { text-align: right; font-weight: 500; } 
+    th:nth-child(8), td:nth-child(8) { text-align: center; font-weight: bold; } 
+    th:nth-child(9), td:nth-child(9) { text-align: left; } 
+    .app-footer {
+        margin-top: 20px;
+        padding: 10px;
+        text-align: center;
+        color: #888;
+        font-size: 0.85em;
+        border-top: 1px solid #e0e0e0;
+    }
+    @media print {
+        body { background-color: white; padding: 0; }
+        .container, .app-header { box-shadow: none; border: none; }
+        .app-footer, .app-header, #scoreForm, #searchForm, .form-actions, #paginationControls, .action-row, .table-actions, #addEmployeeForm {
+            display: none !important;
+        }
+        .chart-dashboard, table { 
+            display: block !important;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .chart-box { flex: 0 0 48%; page-break-inside: avoid; }
+    }
+/* --- AKHIR KODE CSS --- */
 </style>
 </head>
 <body>
 
-<div class="login-container">
-    <div class="login-header">
-        <h2>Login Aplikasi Kinerja 🔑</h2>
-        <p>Balai Pelaksana Pemilihan Jasa Konstruksi (BP2JK) DIY</p>
+<div class="container">
+    <div class="app-header">
+        <div class="header-content">
+            <img src="logo.png" alt="Logo BP2JK DIY" class="app-logo"> 
+            <div class="app-header-text">
+                <h2>Aplikasi Penilaian Kinerja Pegawai</h2>
+                <p>Balai Pelaksana Pemilihan Jasa Konstruksi (BP2JK) DIY</p>
+            </div>
+        </div>
+        <button class="action-button logout-btn" onclick="logout()">🚪 Logout</button>
     </div>
 
-    <form id="loginForm" onsubmit="event.preventDefault();">
-        <div class="input-group">
-            <label for="nip">NIP (Nomor Induk Pegawai):</label>
-            <input type="text" id="nip" placeholder="Masukkan NIP Anda" required />
+    <h3>➕ Tambah Pegawai </h3>
+    <form id="addEmployeeForm" class="input-form" onsubmit="event.preventDefault(); addNewEmployee();">
+        <div style="grid-column: 1;">
+            <label for="newEmpName">Nama Pegawai Baru:</label>
+            <input id="newEmpName" type="text" placeholder="Masukkan nama lengkap pegawai..." required />
         </div>
-        <div class="input-group">
-            <label for="pin">PIN:</label>
-            <input type="password" id="pin" placeholder="Masukkan PIN Anda" required />
+        <div>
+            <button type="submit" id="addEmployeeButton">Tambah Pegawai</button>
         </div>
+    </form>
+    
+    <hr>
+    
+    <h3>📥 Input Penilaian Kinerja</h3>
+    <form id="scoreForm" class="input-form">
+        <input type="hidden" id="editIndex" value="-1" />
         
-        <button type="button" id="loginAdminButton" onclick="handleLogin('admin')">Masuk sebagai Administrator</button>
-        <button type="button" id="loginUserButton" onclick="handleLogin('user')">Lihat Dashboard (User)</button>
-        <div id="message"></div>
+        <label>Nama Pegawai:
+            <div class="name-input-group">
+                <select id="empNameSelect" required></select>
+                <input id="empNameInput" type="text" placeholder="Nama Pegawai" required />
+            </div>
+        </label>
+
+        <label>Divisi / Jabatan :
+            <select id="divisionSelect" required>
+                <option value="" selected>Pilih Divisi</option> 
+            </select>
+        </label>
+        
+        <label>Bulan:
+            <select id="monthSelect" required></select>
+        </label>
+
+        <label>Tahun:
+            <select id="yearSelect" required></select>
+        </label>
+        
+        <label id="labelTaskCount">Jumlah Pekerjaan (1-5)
+            <input id="taskCount" type="number" min="1" max="5" required />
+        </label>
+
+        <label id="labelTaskValue">Nominal Pekerjaan (Rupiah)
+            <input id="taskValue" type="text" placeholder="Rp 0" required />
+        </label>
+
+        <label>Absensi (1-10)
+            <input id="absensi" type="number" min="1" max="10" required />
+        </label>
+
+        <label>Teamwork (1-10)
+            <input id="teamwork" type="number" min="1" max="10" required />
+        </label>
+
+        <label>Komunikasi (1-10)
+            <input id="komunikasi" type="number" min="1" max="10" required />
+        </label>
+
+        <div class="weight-section">
+            <h3>⚙️ Bobot Penilaian (%)</h3>
+            <label>Jml. Pekerjaan:<input id="wCount" type="number" value="32" readonly />%</label>
+            <label>Nominal:<input id="wValue" type="number" value="38" readonly />%</label>
+            <label>Absensi:<input id="wAbs" type="number" value="10" readonly />%</label>
+            <label>Teamwork:<input id="wTeam" type="number" value="10" readonly />%</label>
+            <label>Komunikasi:<input id="wKom" type="number" value="10" readonly />%</label>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" id="saveButton" onclick="saveScore()">Simpan Penilaian</button>
+            <button type="button" id="cancelButton" onclick="cancelEdit()">Batal Edit</button>
+        </div>
     </form>
 
-    <div class="login-footer">
-        Harap hubungi Administrator Sistem jika mengalami masalah.
+    <hr>
+
+    <h3>📊 Dashboard Kinerja</h3>
+    
+    <div class="action-row">
+        <button class="action-button pdf-btn" onclick="exportToPDF(db, 'Laporan_Kinerja_All', true)">📄 Export PDF Dashboard</button>
+        <button class="action-button export-btn" onclick="exportAllDataToExcel()">⬇️ Export XLS All Data</button>
+        <button class="action-button print-btn" onclick="printElement('dashboardSection', 'Laporan Kinerja Pegawai BP2JK DIY - Dashboard')">🖨️ Print Dashboard</button>
+    </div>
+
+    <div id="dashboardSection" class="chart-dashboard">
+        <div class="chart-box">
+            <h4>Rata-rata Kinerja Pegawai (Bulanan)</h4>
+            <canvas id="overallChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h4>Rata-rata Kinerja Per Divisi</h4>
+            <canvas id="divisionChart"></canvas>
+        </div>
+    </div>
+
+    <h3>📄 Data Tersimpan</h3>
+
+    <form id="searchForm" onsubmit="event.preventDefault(); render();">
+        <div>
+            <label for="searchName">Nama Pegawai:</label>
+            <select id="searchName">
+                <option value="">-- Semua Pegawai --</option>
+            </select>
+        </div>
+        <div>
+            <label for="searchDivision">Divisi:</label>
+            <select id="searchDivision">
+                <option value="">-- Semua Divisi --</option>
+            </select>
+        </div>
+        <div>
+            <label for="searchMonth">Bulan:</label>
+            <select id="searchMonth">
+                <option value="">-- Semua Bulan --</option>
+            </select>
+        </div>
+        <div>
+            <label for="searchYear">Tahun:</label>
+            <select id="searchYear">
+                <option value="">-- Semua Tahun --</option>
+            </select>
+        </div>
+        <button type="submit" id="searchButton">Cari Data</button>
+    </form>
+    
+    <div class="action-row">
+        <button class="action-button pdf-btn" onclick="exportToPDF(filteredData, 'Data_Tersimpan_Filtered', false)">📄 Export PDF Filtered</button>
+        <button class="action-button export-btn" onclick="exportFilteredDataToExcel()">⬇️ Export XLS Filtered</button>
+        <button class="action-button print-btn" onclick="printElement('dataTableSection', 'Laporan Kinerja Pegawai BP2JK DIY - Data Tersimpan')">🖨️ Print Data</button>
+    </div>
+
+    <div id="dataTableSection">
+        <table>
+        <thead>
+        <tr>
+        <th>No</th> <th>Nama Pegawai</th>
+        <th>Divisi</th> <th>Bulan</th>
+        <th>Tahun</th>
+        <th>Jml. Pkrjn</th>
+        <th>Nominal Pekerjaan</th>
+        <th>Skor Akhir</th> 
+        <th>Aksi</th>
+        </tr>
+        </thead>
+        <tbody id="dataBody"></tbody>
+        </table>
+        
+        <div id="paginationControls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 10px; background-color: #e9f5ff; border-radius: 4px;">
+            <button type="button" id="prevPage" class="action-button" onclick="changePage(-1)" style="background-color: #007bff; color: white; padding: 10px 15px; display: none;">&larr; Previous</button>
+            <span id="pageInfo" style="color: #0056b3; font-weight: 600;"></span>
+            <button type="button" id="nextPage" class="action-button" onclick="changePage(1)" style="background-color: #007bff; color: white; padding: 10px 15px; display: none;">Next &rarr;</button>
+        </div>
     </div>
 </div>
 
+<div class="app-footer">
+    Copyright &copy; 2025 by RWA Project
+</div>
+
 <script>
-const ADMIN_APP_URL = 'index.html';
-const USER_APP_URL = 'user.html';
+// --- Pemeriksaan Status Login (Hanya Admin) ---
+const LOGIN_PAGE_URL = 'login.html'; 
 
-// ⚠️ WAJIB DIGANTI! GANTI DENGAN URL WEB APP APPS SCRIPT ANDA
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzzzz/exec'; 
+if (localStorage.getItem('isAdminLoggedIn') !== 'true') {
+    window.location.href = LOGIN_PAGE_URL;
+}
 
-document.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem('isAdminLoggedIn') === 'true') {
-        window.location.href = ADMIN_APP_URL;
-    } else if (localStorage.getItem('isUserLoggedIn') === 'true') {
-        window.location.href = USER_APP_URL;
+function logout() {
+    if (confirm('Anda yakin ingin keluar dari aplikasi?')) {
+        localStorage.removeItem('isAdminLoggedIn');
+        localStorage.removeItem('isUserLoggedIn');
+        window.location.href = LOGIN_PAGE_URL;
     }
-});
+}
+// ------------------------------------------
 
-function setButtonState(disabled, text) {
-    document.getElementById('loginAdminButton').disabled = disabled;
-    document.getElementById('loginUserButton').disabled = disabled;
-    if (text) {
-        document.getElementById('loginAdminButton').textContent = text;
-        document.getElementById('loginUserButton').textContent = text;
-    } else {
-        document.getElementById('loginAdminButton').textContent = 'Masuk sebagai Administrator';
-        document.getElementById('loginUserButton').textContent = 'Lihat Dashboard (User)';
+const { jsPDF } = window.jspdf;
+function $(id){ return document.getElementById(id); }
+
+// --- KONSTANTA & INISIALISASI DATA ---
+const STORAGE_KEY = 'bp2jk_performance_data';
+const STORAGE_KEY_EMPS = 'bp2jk_employee_names';
+
+const divisions = ["Kep. Balai", "Kasubag TU", "Pokja", "Tim Peneliti", "Tim Pelaksana", "Kesatkeran", "Staff", "Outsourcing"]; 
+const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+const productionDivisions = ['Pokja', 'Tim Peneliti', 'Tim Pelaksana'];
+
+const TARGET_NOMINAL_POKJA = 250000000000; 
+const TARGET_NOMINAL_KESATKERAN = 1000000000; 
+
+const baseWeights = { 
+    'Kep. Balai': { wCount: 0, wValue: 0, wAbs: 10, wTeam: 45, wKom: 45 },
+    'Kasubag TU': { wCount: 0, wValue: 0, wAbs: 10, wTeam: 45, wKom: 45 },
+    'Pokja': { wCount: 32, wValue: 38, wAbs: 10, wTeam: 10, wKom: 10 }, 
+    'Tim Peneliti': { wCount: 32, wValue: 38, wAbs: 10, wTeam: 10, wKom: 10 },
+    'Tim Pelaksana': { wCount: 32, wValue: 38, wAbs: 10, wTeam: 10, wKom: 10 },
+    'Staff': { wCount: 0, wValue: 0, wAbs: 30, wTeam: 35, wKom: 35 },
+    'Outsourcing': { wCount: 0, wValue: 0, wAbs: 30, wTeam: 35, wKom: 35 },
+    'Kesatkeran': { wCount: 0, wValue: 40, wAbs: 10, wTeam: 25, wKom: 25 } 
+};
+
+// Global variables
+let db = []; 
+let uniqueEmployeeNames = []; 
+const ROWS_PER_PAGE = 10;
+let currentPage = 1;
+let filteredData = []; 
+let globalAvgScore = 0; 
+
+
+// --- FUNGSI LOCAL STORAGE (Data Persistence) ---
+
+function fetchData() {
+    const dataKinerja = localStorage.getItem(STORAGE_KEY);
+    db = dataKinerja ? JSON.parse(dataKinerja) : [];
+
+    const dataEmps = localStorage.getItem(STORAGE_KEY_EMPS);
+    uniqueEmployeeNames = dataEmps ? JSON.parse(dataEmps) : [];
+}
+
+function saveToLocalStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+    localStorage.setItem(STORAGE_KEY_EMPS, JSON.stringify(uniqueEmployeeNames.sort()));
+}
+
+// --- FUNGSI UTAMA (Dropdowns, Format, Weights) ---
+
+function initDropdowns() {
+    const divisionSelect = $('divisionSelect');
+    const searchDivisionSelect = $('searchDivision');
+    const monthSelect = $('monthSelect');
+    const searchMonthSelect = $('searchMonth');
+    const yearSelect = $('yearSelect');
+    const searchYearSelect = $('searchYear');
+    
+    divisionSelect.innerHTML = '<option value="" selected>Pilih Divisi</option>';
+    searchDivisionSelect.innerHTML = '<option value="">-- Semua Divisi --</option>';
+
+    divisions.forEach(p => {
+        divisionSelect.innerHTML += `<option value="${p}">${p}</option>`;
+        searchDivisionSelect.innerHTML += `<option value="${p}">${p}</option>`;
+    });
+
+    for(let m=0; m<12; m++){
+        const val = m + 1;
+        monthSelect.innerHTML += `<option value="${val}">${monthNames[m]}</option>`;
+        searchMonthSelect.innerHTML += `<option value="${val}">${monthNames[m]}</option>`;
+    }
+
+    const currentYear = new Date().getFullYear();
+    const startYear = 2025; 
+    const endYear = currentYear + 5; 
+    yearSelect.innerHTML = '';
+    searchYearSelect.innerHTML = '<option value="">-- Semua Tahun --</option>';
+
+    for(let y = startYear; y <= endYear; y++){
+        const selected = (y === currentYear) ? 'selected' : ''; 
+        yearSelect.innerHTML += `<option value="${y}" ${selected}>${y}</option>`;
+        searchYearSelect.innerHTML += `<option value="${y}">${y}</option>`;
     }
 }
 
-function handleLogin(role) {
-    const nip = document.getElementById('nip').value.trim();
-    const pin = document.getElementById('pin').value.trim();
-    const message = document.getElementById('message');
+function populateNameDropdowns() {
+    const empNameSelect = $('empNameSelect'); 
+    const searchNameSelect = $('searchName');
+    
+    const currentSelectedName = empNameSelect.value;
+    const currentSearchName = searchNameSelect.value;
+    
+    empNameSelect.innerHTML = '<option value="" selected>Pilih Nama Pegawai</option>';
+    uniqueEmployeeNames.forEach(name => {
+        const selected = name === currentSelectedName ? 'selected' : '';
+        empNameSelect.innerHTML += `<option value="${name}" ${selected}>${name}</option>`;
+    });
+    if (uniqueEmployeeNames.includes(currentSelectedName)) {
+        empNameSelect.value = currentSelectedName;
+    }
 
-    if (!nip || !pin) {
-        message.textContent = 'NIP dan PIN harus diisi.';
+    searchNameSelect.innerHTML = '<option value="">-- Semua Pegawai --</option>';
+    uniqueEmployeeNames.forEach(name => {
+        const selected = name === currentSearchName ? 'selected' : '';
+        searchNameSelect.innerHTML += `<option value="${name}" ${selected}>${name}</option>`;
+    });
+    if (uniqueEmployeeNames.includes(currentSearchName)) {
+        searchNameSelect.value = currentSearchName;
+    }
+}
+
+function getWeights(division) {
+    return baseWeights[division] || baseWeights['Pokja'];
+}
+
+function updateWeightDisplay(division) {
+    const weights = getWeights(division); 
+    $('wCount').value = weights.wCount;
+    $('wValue').value = weights.wValue;
+    $('wAbs').value = weights.wAbs;
+    $('wTeam').value = weights.wTeam;
+    $('wKom').value = weights.wKom;
+
+    const isProduction = productionDivisions.includes(division);
+    const isKesatkeran = (division === 'Kesatkeran');
+    const hideCount = !isProduction; 
+    const hideValue = !isProduction && !isKesatkeran;
+    const labelCount = $('labelTaskCount');
+    const labelValue = $('labelTaskValue');
+    const disableTeamworkKom = (division === 'Kep. Balai' || division === 'Kasubag TU');
+
+    if (labelCount) { labelCount.style.display = hideCount ? 'none' : 'block'; }
+    if (labelValue) { labelValue.style.display = hideValue ? 'none' : 'block'; }
+    
+    $('taskCount').required = !hideCount; 
+    $('taskValue').required = !hideValue;
+    
+    $('teamwork').disabled = disableTeamworkKom;
+    $('komunikasi').disabled = disableTeamworkKom;
+
+    if (disableTeamworkKom) {
+        $('teamwork').value = '';
+        $('komunikasi').value = '';
+        $('teamwork').placeholder = 'Otomatis';
+        $('komunikasi').placeholder = 'Otomatis';
+    } else {
+        $('teamwork').placeholder = '';
+        $('komunikasi').placeholder = '';
+    }
+    
+    $('absensi').min = 1;
+    $('teamwork').min = 1;
+    $('komunikasi').min = 1;
+    $('taskCount').min = hideCount ? 0 : 1; 
+}
+
+
+function formatRupiah(num){
+    if (isNaN(num) || num === 0) return 'Rp 0';
+    return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR'}).format(num).replace(',00','');
+}
+
+// --- FUNGSI TAMBAH PEGAWAI ---
+async function addNewEmployee() {
+    const newName = $('newEmpName').value.trim();
+    if (newName === '') { alert('Nama pegawai baru tidak boleh kosong!'); return; }
+
+    if (uniqueEmployeeNames.map(n => n.toLowerCase()).includes(newName.toLowerCase())) {
+        alert(`Pegawai dengan nama "${newName}" sudah ada.`);
         return;
     }
 
-    setButtonState(true, 'Memverifikasi...');
-    message.textContent = 'Memverifikasi...';
-    message.style.color = '#007bff';
+    $('addEmployeeButton').disabled = true;
+    $('addEmployeeButton').textContent = 'Menambah...';
+    
+    try {
+        uniqueEmployeeNames.push(newName);
+        saveToLocalStorage();
+        
+        await new Promise(resolve => setTimeout(resolve, 50)); 
+        populateNameDropdowns(); 
+        
+        alert(`Pegawai "${newName}" berhasil ditambahkan!`);
+        $('newEmpName').value = '';
+        $('empNameSelect').value = newName; 
 
-    const url = `${APPS_SCRIPT_URL}?nip=${encodeURIComponent(nip)}&pin=${encodeURIComponent(pin)}`;
-
-    fetch(url)
-        .then(response => {
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.indexOf("application/json") !== -1) {
-                return response.json();
-            } else {
-                // Apps Script sering mengirim HTML/teks error jika terjadi masalah
-                throw new Error('Gagal terhubung ke Apps Script atau respon tidak valid.');
-            }
-        })
-        .then(data => {
-            if (data.success) {
-                let redirectURL = null;
-                let loginKey = null;
-
-                // Jika tombol Admin diklik DAN peran yang dikembalikan adalah admin
-                if (role === 'admin' && data.role === 'admin') {
-                    redirectURL = ADMIN_APP_URL;
-                    loginKey = 'isAdminLoggedIn';
-                } 
-                // Jika tombol User diklik DAN peran yang dikembalikan adalah admin atau user
-                else if (role === 'user' && (data.role === 'admin' || data.role === 'user')) {
-                    redirectURL = USER_APP_URL;
-                    loginKey = 'isUserLoggedIn';
-                } else {
-                    message.textContent = 'Anda tidak memiliki hak akses yang diminta.';
-                }
-
-                if (redirectURL) {
-                    message.textContent = 'Login Berhasil! Mengarahkan...';
-                    message.style.color = '#28a745';
-                    localStorage.removeItem('isAdminLoggedIn');
-                    localStorage.removeItem('isUserLoggedIn');
-                    localStorage.setItem(loginKey, 'true');
-                    setTimeout(() => {
-                        window.location.href = redirectURL;
-                    }, 1000);
-                    return;
-                }
-
-            } else {
-                message.textContent = 'NIP atau PIN salah.';
-            }
-            
-            message.style.color = '#dc3545';
-            setButtonState(false);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            message.textContent = 'Gagal terhubung ke server verifikasi. Cek koneksi & URL Apps Script.';
-            message.style.color = '#dc3545';
-            setButtonState(false);
-        });
+    } catch (error) {
+        console.error('Gagal menambah pegawai baru:', error);
+    } finally {
+        $('addEmployeeButton').disabled = false;
+        $('addEmployeeButton').textContent = 'Tambah Pegawai';
+    }
 }
+
+// --- FUNGSI PERHITUNGAN SKOR ---
+
+function calculateScore(tc, tv, ab, tw, km, division, inputNominalRupiah) {
+    const { wCount, wValue, wAbs, wTeam, wKom } = getWeights(division); 
+    const w1 = wCount, w2 = wValue, w3 = wAbs, w4 = wTeam, w5 = wKom;
+    const isProduction = productionDivisions.includes(division);
+    const targetNominal = isProduction ? TARGET_NOMINAL_POKJA : TARGET_NOMINAL_KESATKERAN;
+
+    let sCount = 0;
+    if (w1 > 0) sCount = Math.min(100, (tc / 5) * 100); 
+    
+    let sValue = 0;
+    if (w2 > 0) sValue = inputNominalRupiah > 0 ? Math.min(100, (inputNominalRupiah / targetNominal) * 100) : 0; 
+    
+    let sAbs = ab * 10;
+    
+    let sTeam, sKom;
+    
+    if (division === 'Kep. Balai' || division === 'Kasubag TU') {
+        let globalScoreNormalized = globalAvgScore; 
+        sTeam = globalScoreNormalized; 
+        sKom = globalScoreNormalized; 
+        if (globalAvgScore === 0) { sTeam = 0; sKom = 0; }
+    } else {
+        sTeam = tw * 10;
+        sKom = km * 10;
+    }
+
+    let finalScore = (
+        sCount * w1/100 + 
+        sValue * w2/100 + 
+        sAbs * w3/100 +   
+        sTeam * w4/100 +  
+        sKom * w5/100     
+    );
+
+    const finalWeights = { wCount, wValue, wAbs, wTeam, wKom };
+    return { finalScore: finalScore.toFixed(1), finalWeights: finalWeights, sTeamRaw: sTeam, sKomRaw: sKom };
+}
+
+// --- FUNGSI CRUD LOKAL (Save, Edit, Delete) ---
+
+async function saveScore(){
+    const editIndex = Number($('editIndex').value);
+    
+    let name = editIndex > -1 ? $('empNameInput').value.trim() : $('empNameSelect').value.trim();
+    let division = $('divisionSelect').value; 
+    
+    if (name === '' || division === '') { alert('Nama/Divisi wajib diisi!'); return; }
+    
+    let month = $('monthSelect').value;
+    let year = $('yearSelect').value;
+    let tc = Number($('taskCount').value);
+    let tv_rupiah = Number($('taskValue').value.replace(/[^0-9]/g,'')); 
+    let ab = Number($('absensi').value);
+    let tw = Number($('teamwork').value);
+    let km = Number($('komunikasi').value);
+    
+    // Validasi
+    const isLeadership = (division === 'Kep. Balai' || division === 'Kasubag TU');
+    if (isNaN(ab) || ab < 1 || ab > 10) { alert('Pastikan Absensi diisi dengan angka yang valid (1-10).'); return; }
+    if (!isLeadership && (isNaN(tw) || isNaN(km) || tw < 1 || km < 1 || tw > 10 || km > 10)) {
+        alert('Pastikan Teamwork dan Komunikasi diisi dengan angka yang valid (1-10).'); return;
+    }
+    const isProd = productionDivisions.includes(division);
+    const isKesatkeran = division === 'Kesatkeran';
+    if (isProd && (isNaN(tc) || isNaN(tv_rupiah) || tc < 0)) { alert('Untuk Divisi Produksi, Jumlah Pekerjaan dan Nominal Pekerjaan wajib diisi.'); return; } 
+    if (isKesatkeran && isNaN(tv_rupiah)) { alert('Untuk Kesatkeran, Nominal Pekerjaan wajib diisi.'); return; }
+
+    if (!isProd && !isKesatkeran) { tc = 0; tv_rupiah = 0; }
+
+    const { finalScore, finalWeights, sTeamRaw, sKomRaw } = calculateScore(tc, tv_rupiah, ab, tw, km, division, tv_rupiah);
+
+    const newData = {
+        name, division, month, year, finalScore, 
+        tc_raw: tc, tv_raw: tv_rupiah, ab_raw: ab, 
+        tw_raw: isLeadership ? sTeamRaw : tw, 
+        km_raw: isLeadership ? sKomRaw : km, 
+        w_final: finalWeights
+    };
+    
+    $('saveButton').disabled = true;
+    $('saveButton').textContent = editIndex > -1 ? 'Memperbarui...' : 'Menyimpan...';
+
+    if (editIndex > -1) {
+        db[editIndex] = newData;
+        alert('Data berhasil diperbarui!');
+        cancelEdit();
+    } else {
+        db.push(newData);
+        if (!uniqueEmployeeNames.includes(name)) { uniqueEmployeeNames.push(name); }
+        alert('Data berhasil disimpan!');
+        $('scoreForm').reset();
+        $('taskValue').value = ''; 
+        $('divisionSelect').value = ''; 
+        $('empNameSelect').value = ''; 
+        updateWeightDisplay(divisions[0]);
+    }
+    
+    saveToLocalStorage();
+    fetchData(); 
+    render();
+    
+    $('saveButton').disabled = false;
+    $('saveButton').textContent = editIndex > -1 ? 'Perbarui Data' : 'Simpan Penilaian';
+}
+
+
+function editScore(index){
+    const data = db[index];
+    const isLeadership = (data.division === 'Kep. Balai' || data.division === 'Kasubag TU');
+    
+    $('empNameSelect').style.display = 'none';
+    $('empNameInput').style.display = 'block';
+    $('empNameInput').value = data.name;
+    
+    $('divisionSelect').value = data.division; 
+    updateWeightDisplay(data.division); 
+    
+    $('monthSelect').value = data.month;
+    $('yearSelect').value = data.year;
+    
+    $('taskCount').value = data.tc_raw || ''; 
+    $('taskValue').value = formatRupiah(data.tv_raw || 0);
+    $('absensi').value = data.ab_raw || '';
+    
+    if (isLeadership) {
+         $('teamwork').value = ''; 
+         $('komunikasi').value = ''; 
+    } else {
+         $('teamwork').value = data.tw_raw || ''; 
+         $('komunikasi').value = data.km_raw || ''; 
+    }
+    
+    $('editIndex').value = index;
+    $('saveButton').textContent = 'Perbarui Data';
+    $('cancelButton').style.display = 'inline-block';
+    
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function deleteScore(index){
+    const data = db[index];
+    const confirmDelete = confirm(`Anda yakin ingin menghapus data untuk ${data.name} (${monthNames[data.month-1]} ${data.year})?`);
+    if (confirmDelete) {
+        db.splice(index, 1); 
+        saveToLocalStorage();
+        fetchData(); 
+        render();
+        alert('Data berhasil dihapus!');
+    }
+}
+
+function cancelEdit() {
+    $('editIndex').value = -1;
+    $('saveButton').textContent = 'Simpan Penilaian';
+    $('cancelButton').style.display = 'none';
+    
+    $('empNameSelect').style.display = 'block';
+    $('empNameInput').style.display = 'none';
+    
+    $('scoreForm').reset();
+    $('taskValue').value = ''; 
+    $('divisionSelect').value = ''; 
+    $('empNameSelect').value = ''; 
+    updateWeightDisplay(divisions[0]); 
+}
+
+// --- FUNGSI CHART & RENDER ---
+
+let overallChartInstance = null;
+let divisionChartInstance = null;
+
+function updateCharts() {
+    let totalScore = 0;
+    let totalCount = 0;
+    
+    db.forEach(d => {
+        const score = parseFloat(d.finalScore);
+        if (!isNaN(score)) { totalScore += score; totalCount++; }
+    });
+
+    globalAvgScore = totalCount > 0 ? (totalScore / totalCount) : 0;
+    
+    // Recalculate leadership scores based on new globalAvgScore
+    db.forEach(d => {
+        if (d.division === 'Kep. Balai' || d.division === 'Kasubag TU') {
+            const { finalScore, sTeamRaw, sKomRaw } = calculateScore(0, 0, d.ab_raw, 0, 0, d.division, 0);
+            d.finalScore = finalScore;
+            d.tw_raw = sTeamRaw; 
+            d.km_raw = sKomRaw;
+        }
+    });
+    
+    const monthlyStats = Array(12).fill(0).map(() => ({ total: 0, count: 0 }));
+    const divStats = {};
+    divisions.forEach(d => divStats[d] = { total: 0, count: 0 });
+
+    db.forEach(d => {
+        const score = parseFloat(d.finalScore);
+        const mIdx = parseInt(d.month) - 1;
+        if (mIdx >= 0 && mIdx < 12) {
+            monthlyStats[mIdx].total += score;
+            monthlyStats[mIdx].count++;
+        }
+        if (divStats.hasOwnProperty(d.division)) {
+            divStats[d.division].total += score;
+            divStats[d.division].count++;
+        }
+    });
+
+    const monthlyAvgs = monthlyStats.map(s => s.count > 0 ? (s.total / s.count).toFixed(1) : 0);
+    const divAvgs = divisions.map(d => {
+        const s = divStats[d];
+        return s.count > 0 ? (s.total / s.count).toFixed(1) : 0;
+    });
+
+    const allAverages = [...monthlyAvgs.map(Number), ...divAvgs.map(Number)].filter(n => n > 0);
+    let chartMax = 100; 
+    if (allAverages.length > 0) {
+        const maxData = Math.max(...allAverages);
+        chartMax = Math.min(100, Math.ceil((maxData * 1.05) / 5) * 5); 
+    }
+    
+    const ctx1 = document.getElementById('overallChart').getContext('2d');
+    if (overallChartInstance) overallChartInstance.destroy(); 
+    overallChartInstance = new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: monthNames,
+            datasets: [{
+                label: 'Rata-rata Kinerja (Semua Pegawai)',
+                data: monthlyAvgs,
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true, max: chartMax, title: { display: true, text: 'Skor' } } }
+        }
+    });
+
+    const ctx2 = document.getElementById('divisionChart').getContext('2d');
+    if (divisionChartInstance) divisionChartInstance.destroy();
+    const barColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#009688', '#FF5722']; 
+    divisionChartInstance = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: divisions,
+            datasets: [{
+                label: 'Rata-rata Skor',
+                data: divAvgs,
+                backgroundColor: barColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true, max: chartMax } },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+function changePage(delta) {
+    const totalPages = Math.ceil(filteredData.length / ROWS_PER_PAGE);
+    const newPage = currentPage + delta;
+
+    if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        renderTable(); 
+        window.scrollTo({ top: document.querySelector('table').offsetTop - 20, behavior: 'smooth' });
+    }
+}
+
+function renderTable() {
+    const startIndex = (currentPage - 1) * ROWS_PER_PAGE;
+    const endIndex = startIndex + ROWS_PER_PAGE;
+    const dataToDisplay = filteredData.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(filteredData.length / ROWS_PER_PAGE);
+
+    $('dataBody').innerHTML = '';
+    
+    if (dataToDisplay.length === 0 && filteredData.length === 0) {
+        $('dataBody').innerHTML = `<tr><td colspan="9" style="text-align:center; color: #dc3545;">Tidak ada data yang cocok dengan kriteria pencarian.</td></tr>`;
+    } else {
+        dataToDisplay.forEach((d, i)=>{
+            const originalIndex = db.findIndex(item => item === d); 
+            const displayMonth = monthNames[parseInt(d.month) - 1]; 
+            
+            $('dataBody').innerHTML += `
+                <tr>
+                    <td>${i + startIndex + 1}</td> <td>${d.name}</td>
+                    <td>${d.division || '-'}</td> <td>${displayMonth}</td>
+                    <td>${d.year}</td>
+                    <td style="text-align: right;">${d.tc_raw || '-'}</td>
+                    <td style="text-align: right;">${formatRupiah(d.tv_raw || 0)}</td>
+                    <td>${d.finalScore}</td>
+                    <td>
+                        <button class="action-button edit-btn" onclick="editScore(${originalIndex})">Edit</button>
+                        <button class="action-button delete-btn" onclick="deleteScore(${originalIndex})">Hapus</button>
+                    </td>
+                </tr>`;
+        });
+    }
+
+    const prevButton = $('prevPage');
+    const nextButton = $('nextPage');
+    const pageInfo = $('pageInfo');
+    
+    if (filteredData.length > ROWS_PER_PAGE) {
+        prevButton.style.display = 'inline-block';
+        nextButton.style.display = 'inline-block';
+
+        prevButton.disabled = currentPage === 1;
+        nextButton.disabled = currentPage === totalPages;
+
+        prevButton.style.backgroundColor = currentPage === 1 ? '#ccc' : '#007bff';
+        nextButton.style.backgroundColor = currentPage === totalPages ? '#ccc' : '#007bff';
+
+        pageInfo.textContent = `Halaman ${currentPage} dari ${totalPages} (${filteredData.length} data)`;
+    } else {
+        prevButton.style.display = 'none';
+        nextButton.style.display = 'none';
+        pageInfo.textContent = filteredData.length > 0 ? `Total ${filteredData.length} data` : '';
+    }
+}
+
+
+function render(){
+    fetchData();
+    populateNameDropdowns();
+    updateCharts(); 
+
+    const searchQuery = $('searchName').value.toLowerCase();
+    const searchDivision = $('searchDivision').value; 
+    const searchMonth = $('searchMonth').value;
+    const searchYear = $('searchYear').value;
+
+    filteredData = db.filter(d => {
+        const nameMatch = searchQuery === '' || (d.name && d.name.toLowerCase().includes(searchQuery));
+        const divisionMatch = searchDivision === '' || d.division === searchDivision; 
+        const monthMatch = searchMonth === '' || d.month.toString() === searchMonth;
+        const yearMatch = searchYear === '' || d.year.toString() === searchYear;
+
+        return nameMatch && divisionMatch && monthMatch && yearMatch;
+    });
+    
+    currentPage = 1;
+    renderTable();
+}
+
+// --- FUNGSI EXPORT ---
+
+function workbookToS2ab(workbook) {
+    const wopts = { bookType: 'xlsx', bookSST: false, type: 'binary' };
+    const ws = XLSX.write(workbook, wopts);
+    function s2ab(s) {
+        const buf = new ArrayBuffer(s.length);
+        const view = new Uint8Array(buf);
+        for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+        return buf;
+    }
+    return new Blob([s2ab(ws)], { type: 'application/octet-stream' });
+}
+
+function exportDataToExcel(data, filename) {
+    if (typeof XLSX === 'undefined') {
+        alert("Gagal export. Pastikan library XLSX.js telah dimuat.");
+        return;
+    }
+
+    const exportData = data.map((d, index) => ({
+        'No.': index + 1,
+        'Nama Pegawai': d.name,
+        'Divisi': d.division || '-',
+        'Bulan': monthNames[parseInt(d.month) - 1],
+        'Tahun': d.year,
+        'Jml. Pekerjaan': d.tc_raw || '-',
+        'Nominal Pekerjaan (Rp)': d.tv_raw || 0,
+        'Skor Akhir': d.finalScore
+    }));
+    
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Kinerja');
+    
+    const blob = workbookToS2ab(workbook);
+    saveAs(blob, filename + '.xlsx');
+}
+
+function saveAs(blob, filename) {
+    const a = document.createElement('a');
+    a.href = window.URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(a.href);
+}
+
+function exportAllDataToExcel() {
+    exportDataToExcel(db, 'Laporan_Kinerja_All');
+}
+
+function exportFilteredDataToExcel() {
+    exportDataToExcel(filteredData, 'Data_Tersimpan_Filtered');
+}
+
+function exportToPDF(data, filename, isDashboard) {
+    alert("Fungsi Export PDF memerlukan implementasi lanjutan jspdf-autotable.");
+}
+function printElement(elementId, title) {
+    window.print();
+}
+
+// Initial Render
+document.addEventListener('DOMContentLoaded', () => {
+    initDropdowns();
+    $('divisionSelect').value = divisions[0]; 
+    updateWeightDisplay(divisions[0]);
+    
+    $('divisionSelect').addEventListener('change', (e) => {
+        const selectedDivision = e.target.value;
+        updateWeightDisplay(selectedDivision);
+        const isProduction = productionDivisions.includes(selectedDivision);
+        const isKesatkeran = (selectedDivision === 'Kesatkeran');
+        
+        const resetCount = !isProduction;
+        const resetValue = !isProduction && !isKesatkeran;
+        
+        if (resetCount) { $('taskCount').value = 0; }
+        if (resetValue) { $('taskValue').value = 'Rp 0'; }
+        
+        if (!isProduction && !isKesatkeran) {
+              $('teamwork').disabled = false;
+              $('komunikasi').disabled = false;
+        }
+    });
+    
+    $('taskValue').addEventListener('input', (e) => {
+        let v_rupiah = e.target.value.replace(/[^0-9]/g,'');
+        if(!v_rupiah){ $('taskValue').value=''; return; }
+        $('taskValue').value = formatRupiah(Number(v_rupiah));
+    });
+    
+    render(); 
+});
 </script>
 </body>
 </html>
