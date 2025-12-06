@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dashboard Kinerja Pegawai BP2JK DIY</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<style>
+/* --- KODE CSS LENGKAP (Modifikasi untuk menyembunyikan elemen tertentu) --- */
+    body { 
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+        background-color: #f4f7f6; 
+        color: #333;
+        padding: 40px 20px; 
+    }
+    .app-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between; 
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #007bff;
+    }
+    .header-content {
+        display: flex;
+        align-items: center;
+    }
+    .app-logo {
+        width: 80px; 
+        height: 80px;
+        margin-right: 20px;
+        border-radius: 50%;
+        object-fit: contain;
+        display: block; 
+    }
+    .app-header-text h2 { 
+        color: #007bff; 
+        margin: 0;
+        font-size: 1.8em;
+    }
+    .app-header-text p {
+        margin: 0;
+        color: #555;
+        font-size: 1.1em;
+    }
+    h3 { 
+        color: #007bff; 
+        border-bottom: 2px solid #e0e0e0; 
+        padding-bottom: 5px;
+        margin-top: 30px;
+    }
+    .container {
+        max-width: 1200px; 
+        margin: 0 auto;
+        background-color: #ffffff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    /* Sembunyikan form input yang tidak relevan untuk user view */
+    .input-form, #addEmployeeForm { display: none; }
+    
+    label { 
+        display: block; 
+        margin-top: 5px; 
+        font-weight: 600;
+        color: #555;
+    }
+    input[type="text"], 
+    input[type="number"], 
+    select { 
+        width: 100%;
+        padding: 10px; 
+        margin-top: 5px; 
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    .form-actions {
+        grid-column: 1 / -1;
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    button {
+        padding: 12px 25px;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1.0em;
+        transition: background-color 0.3s;
+    }
+    .logout-btn {
+        background-color: #dc3545;
+        padding: 10px 15px;
+        font-size: 0.9em;
+    }
+    .logout-btn:hover { background-color: #c82333; }
+    
+    .chart-dashboard {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+    .chart-box {
+        flex: 1;
+        min-width: 300px;
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .chart-box h4 {
+        text-align: center;
+        color: #007bff;
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+    .action-row {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-bottom: 15px; 
+        flex-wrap: wrap;
+    }
+    .action-row .action-button {
+        padding: 10px 15px;
+        font-size: 0.9em;
+        margin-right: 0;
+    }
+    .pdf-btn { background-color: #dc3545; color: white; }
+    .export-btn { background-color: #4CAF50; color: white; }
+    .print-btn { background-color: #3f51b5; color: white; }
+    #searchForm {
+        display: flex;
+        gap: 15px;
+        padding: 15px;
+        background-color: #f0f0f0;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+    #searchButton {
+        padding: 10px 20px;
+        background-color: #007bff;
+        height: 40px;
+    }
+    #searchButton:hover {
+        background-color: #0056b3;
+    }
+    #searchForm select, #searchForm input {
+        height: 40px;
+        margin: 0;
+    }
+    table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        margin-top: 5px; 
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        border-radius: 6px;
+        overflow: hidden;
+        font-size: 0.95em;
+    }
+    th, td { 
+        border: 1px solid #ddd; 
+        padding: 10px 8px;
+        text-align: left; 
+    }
+    thead tr { background-color: #007bff; color: white; }
+    tbody tr:nth-child(even) { background-color: #f9f9f9; }
+    tbody tr:hover { background-color: #f1f1f1; }
+    th:nth-child(1), td:nth-child(1) { width: 5%; text-align: center; } 
+    th:nth-child(6), td:nth-child(6) { text-align: right; font-weight: 500; } 
+    th:nth-child(7), td:nth-child(7) { text-align: right; font-weight: 500; } 
+    th:nth-child(8), td:nth-child(8) { text-align: center; font-weight: bold; } 
+    /* Kolom Aksi dihilangkan */
+    th:nth-child(9), td:nth-child(9) { display: none; } 
+
+    .app-footer {
+        margin-top: 20px;
+        padding: 10px;
+        text-align: center;
+        color: #888;
+        font-size: 0.85em;
+        border-top: 1px solid #e0e0e0;
+    }
+    @media print {
+        body { background-color: white; padding: 0; }
+        .container, .app-header { box-shadow: none; border: none; }
+        .app-footer, .app-header, #searchForm, #paginationControls, .action-row, .table-actions {
+            display: none !important;
+        }
+        .chart-dashboard, table { 
+            display: block !important;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .chart-box { flex: 0 0 48%; page-break-inside: avoid; }
+    }
+/* --- AKHIR KODE CSS --- */
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="app-header">
+        <div class="header-content">
+            <img src="logo.png" alt="Logo BP2JK DIY" class="app-logo"> 
+            <div class="app-header-text">
+                <h2>Dashboard Kinerja Pegawai</h2>
+                <p>Balai Pelaksana Pemilihan Jasa Konstruksi (BP2JK) DIY</p>
+            </div>
+        </div>
+        <button class="action-button logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+
+    <hr style="display: none;">
+    <hr style="display: none;">
+
+    <h3>📊 Dashboard Kinerja</h3>
+    
+    <div class="action-row">
+        <button class="action-button pdf-btn" onclick="exportToPDF(db, 'Laporan_Kinerja_All', true)">📄 Export PDF Dashboard</button>
+        <button class="action-button export-btn" onclick="exportAllDataToExcel()">⬇️ Export XLS All Data</button>
+        <button class="action-button print-btn" onclick="printElement('dashboardSection', 'Laporan Kinerja Pegawai BP2JK DIY - Dashboard')">🖨️ Print Dashboard</button>
+    </div>
+
+    <div id="dashboardSection" class="chart-dashboard">
+        <div class="chart-box">
+            <h4>Rata-rata Kinerja Pegawai (Bulanan)</h4>
+            <canvas id="overallChart"></canvas>
+        </div>
+        <div class="chart-box">
+            <h4>Rata-rata Kinerja Per Divisi</h4>
+            <canvas id="divisionChart"></canvas>
+        </div>
+    </div>
+
+    <h3>📄 Data Tersimpan</h3>
+
+    <form id="searchForm" onsubmit="event.preventDefault(); render();">
+        <div>
+            <label for="searchName">Nama Pegawai:</label>
+            <select id="searchName">
+                <option value="">-- Semua Pegawai --</option>
+            </select>
+        </div>
+        <div>
+            <label for="searchDivision">Divisi:</label>
+            <select id="searchDivision">
+                <option value="">-- Semua Divisi --</option>
+            </select>
+        </div>
+        <div>
+            <label for="searchMonth">Bulan:</label>
+            <select id="searchMonth">
+                <option value="">-- Semua Bulan --</option>
+            </select>
+        </div>
+        <div>
+            <label for="searchYear">Tahun:</label>
+            <select id="searchYear">
+                <option value="">-- Semua Tahun --</option>
+            </select>
+        </div>
+        <button type="submit" id="searchButton">Cari Data</button>
+    </form>
+    
+    <div class="action-row">
+        <button class="action-button pdf-btn" onclick="exportToPDF(filteredData, 'Data_Tersimpan_Filtered', false)">📄 Export PDF Filtered</button>
+        <button class="action-button export-btn" onclick="exportFilteredDataToExcel()">⬇️ Export XLS Filtered</button>
+        <button class="action-button print-btn" onclick="printElement('dataTableSection', 'Laporan Kinerja Pegawai BP2JK DIY - Data Tersimpan')">🖨️ Print Data</button>
+    </div>
+
+    <div id="dataTableSection">
+        <table>
+        <thead>
+        <tr>
+        <th>No</th> <th>Nama Pegawai</th>
+        <th>Divisi</th> <th>Bulan</th>
+        <th>Tahun</th>
+        <th>Jml. Pkrjn</th>
+        <th>Nominal Pekerjaan</th>
+        <th>Skor Akhir</th> 
+        <th>Aksi</th> </tr>
+        </thead>
+        <tbody id="dataBody"></tbody>
+        </table>
+        
+        <div id="paginationControls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding: 10px; background-color: #e9f5ff; border-radius: 4px;">
+            <button type="button" id="prevPage" class="action-button" onclick="changePage(-1)" style="background-color: #007bff; color: white; padding: 10px 15px; display: none;">&larr; Previous</button>
+            <span id="pageInfo" style="color: #0056b3; font-weight: 600;"></span>
+            <button type="button" id="nextPage" class="action-button" onclick="changePage(1)" style="background-color: #007bff; color: white; padding: 10px 15px; display: none;">Next &rarr;</button>
+        </div>
+    </div>
+</div>
+
+<div class="app-footer">
+    Copyright &copy; 2025 by RWA Project
+</div>
+
+<script>
+// --- Pemeriksaan Status Login (User) ---
+const LOGIN_PAGE_URL = 'login.html'; 
+
+if (localStorage.getItem('isUserLoggedIn') !== 'true' && localStorage.getItem('isAdminLoggedIn') !== 'true') {
+    window.location.href = LOGIN_PAGE_URL;
+}
+
+function logout() {
+    if (confirm('Anda yakin ingin keluar dari aplikasi?')) {
+        localStorage.removeItem('isAdminLoggedIn'); // Hapus keduanya jika ada
+        localStorage.removeItem('isUserLoggedIn');
+        window.location.href = LOGIN_PAGE_URL;
+    }
+}
+// ------------------------------------------
+
+const { jsPDF } = window.jspdf;
+function $(id){ return document.getElementById(id); }
+
+// --- KONSTANTA & INISIALISASI DATA (Diambil dari index.html) ---
+const STORAGE_KEY = 'bp2jk_performance_data';
+const STORAGE_KEY_EMPS = 'bp2jk_employee_names';
+
+const divisions = ["Kep. Balai", "Kasubag TU", "Pokja", "Tim Peneliti", "Tim Pelaksana", "Kesatkeran", "Staff", "Outsourcing"]; 
+const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+const productionDivisions = ['Pokja', 'Tim Peneliti', 'Tim Pelaksana'];
+
+const TARGET_NOMINAL_POKJA = 250000000000; 
+const TARGET_NOMINAL_KESATKERAN = 1000000000; 
+
+const baseWeights = { 
+    'Kep. Balai': { wCount: 0, wValue: 0, wAbs: 10, wTeam: 45, wKom: 45 },
+    'Kasubag TU': { wCount: 0, wValue: 0, wAbs: 10, wTeam: 45, wKom: 45 },
+    'Pokja': { wCount: 32, wValue: 38, wAbs: 10, wTeam: 10, wKom: 10 }, 
+    'Tim Peneliti': { wCount: 32, wValue: 38, wAbs: 10, wTeam: 10, wKom: 10 },
+    'Tim Pelaksana': { wCount: 32, wValue: 38, wAbs: 10, wTeam: 10, wKom: 10 },
+    'Staff': { wCount: 0, wValue: 0, wAbs: 30, wTeam: 35, wKom: 35 },
+    'Outsourcing': { wCount: 0, wValue: 0, wAbs: 30, wTeam: 35, wKom: 35 },
+    'Kesatkeran': { wCount: 0, wValue: 40, wAbs: 10, wTeam: 25, wKom: 25 } 
+};
+
+// Global variables
+let db = []; 
+let uniqueEmployeeNames = []; 
+const ROWS_PER_PAGE = 10;
+let currentPage = 1;
+let filteredData = []; 
+let globalAvgScore = 0; 
+
+
+// --- FUNGSI LOCAL STORAGE (Data Persistence) ---
+
+function fetchData() {
+    const dataKinerja = localStorage.getItem(STORAGE_KEY);
+    db = dataKinerja ? JSON.parse(dataKinerja) : [];
+
+    const dataEmps = localStorage.getItem(STORAGE_KEY_EMPS);
+    uniqueEmployeeNames = dataEmps ? JSON.parse(dataEmps) : [];
+}
+
+function formatRupiah(num){
+    if (isNaN(num) || num === 0) return 'Rp 0';
+    return new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR'}).format(num).replace(',00','');
+}
+
+// --- FUNGSI UTAMA (Dropdowns dan Render) ---
+
+function initDropdowns() {
+    const searchDivisionSelect = $('searchDivision');
+    const searchMonthSelect = $('searchMonth');
+    const searchYearSelect = $('searchYear');
+    
+    searchDivisionSelect.innerHTML = '<option value="">-- Semua Divisi --</option>';
+
+    divisions.forEach(p => {
+        searchDivisionSelect.innerHTML += `<option value="${p}">${p}</option>`;
+    });
+
+    for(let m=0; m<12; m++){
+        const val = m + 1;
+        searchMonthSelect.innerHTML += `<option value="${val}">${monthNames[m]}</option>`;
+    }
+
+    const currentYear = new Date().getFullYear();
+    const startYear = 2025; 
+    const endYear = currentYear + 5; 
+    searchYearSelect.innerHTML = '<option value="">-- Semua Tahun --</option>';
+
+    for(let y = startYear; y <= endYear; y++){
+        searchYearSelect.innerHTML += `<option value="${y}">${y}</option>`;
+    }
+}
+
+function populateNameDropdowns() {
+    const searchNameSelect = $('searchName');
+    const currentSearchName = searchNameSelect.value;
+    
+    searchNameSelect.innerHTML = '<option value="">-- Semua Pegawai --</option>';
+    uniqueEmployeeNames.forEach(name => {
+        const selected = name === currentSearchName ? 'selected' : '';
+        searchNameSelect.innerHTML += `<option value="${name}" ${selected}>${name}</option>`;
+    });
+    if (uniqueEmployeeNames.includes(currentSearchName)) {
+        searchNameSelect.value = currentSearchName;
+    }
+}
+
+
+// --- FUNGSI PERHITUNGAN SKOR (Untuk RENDER DASHBOARD) ---
+
+function getWeights(division) {
+    return baseWeights[division] || baseWeights['Pokja'];
+}
+
+function calculateScore(tc, tv, ab, tw, km, division, inputNominalRupiah) {
+    const { wCount, wValue, wAbs, wTeam, wKom } = getWeights(division); 
+    const w1 = wCount, w2 = wValue, w3 = wAbs, w4 = wTeam, w5 = wKom;
+    const isProduction = productionDivisions.includes(division);
+    const targetNominal = isProduction ? TARGET_NOMINAL_POKJA : TARGET_NOMINAL_KESATKERAN;
+
+    let sCount = 0;
+    if (w1 > 0) sCount = Math.min(100, (tc / 5) * 100); 
+    
+    let sValue = 0;
+    if (w2 > 0) sValue = inputNominalRupiah > 0 ? Math.min(100, (inputNominalRupiah / targetNominal) * 100) : 0; 
+    
+    let sAbs = ab * 10;
+    
+    let sTeam, sKom;
+    
+    if (division === 'Kep. Balai' || division === 'Kasubag TU') {
+        let globalScoreNormalized = globalAvgScore; 
+        sTeam = globalScoreNormalized; 
+        sKom = globalScoreNormalized; 
+        if (globalAvgScore === 0) { sTeam = 0; sKom = 0; }
+    } else {
+        sTeam = tw * 10;
+        sKom = km * 10;
+    }
+
+    let finalScore = (
+        sCount * w1/100 + 
+        sValue * w2/100 + 
+        sAbs * w3/100 +   
+        sTeam * w4/100 +  
+        sKom * w5/100     
+    );
+
+    return { finalScore: finalScore.toFixed(1), sTeamRaw: sTeam, sKomRaw: sKom };
+}
+
+
+// --- FUNGSI CHART & RENDER ---
+
+let overallChartInstance = null;
+let divisionChartInstance = null;
+
+function updateCharts() {
+    // Bagian ini sama persis dengan index.html untuk memastikan konsistensi perhitungan
+    let totalScore = 0;
+    let totalCount = 0;
+    
+    db.forEach(d => {
+        const score = parseFloat(d.finalScore);
+        if (!isNaN(score)) { totalScore += score; totalCount++; }
+    });
+
+    globalAvgScore = totalCount > 0 ? (totalScore / totalCount) : 0;
+    
+    // Recalculate leadership scores based on new globalAvgScore (Penting untuk data Kep. Balai/Kasubag TU)
+    db.forEach(d => {
+        if (d.division === 'Kep. Balai' || d.division === 'Kasubag TU') {
+            const { finalScore, sTeamRaw, sKomRaw } = calculateScore(0, 0, d.ab_raw, 0, 0, d.division, 0);
+            d.finalScore = finalScore;
+            d.tw_raw = sTeamRaw; 
+            d.km_raw = sKomRaw;
+        }
+    });
+    
+    const monthlyStats = Array(12).fill(0).map(() => ({ total: 0, count: 0 }));
+    const divStats = {};
+    divisions.forEach(d => divStats[d] = { total: 0, count: 0 });
+
+    db.forEach(d => {
+        const score = parseFloat(d.finalScore);
+        const mIdx = parseInt(d.month) - 1;
+        if (mIdx >= 0 && mIdx < 12) {
+            monthlyStats[mIdx].total += score;
+            monthlyStats[mIdx].count++;
+        }
+        if (divStats.hasOwnProperty(d.division)) {
+            divStats[d.division].total += score;
+            divStats[d.division].count++;
+        }
+    });
+
+    const monthlyAvgs = monthlyStats.map(s => s.count > 0 ? (s.total / s.count).toFixed(1) : 0);
+    const divAvgs = divisions.map(d => {
+        const s = divStats[d];
+        return s.count > 0 ? (s.total / s.count).toFixed(1) : 0;
+    });
+
+    const allAverages = [...monthlyAvgs.map(Number), ...divAvgs.map(Number)].filter(n => n > 0);
+    let chartMax = 100; 
+    if (allAverages.length > 0) {
+        const maxData = Math.max(...allAverages);
+        chartMax = Math.min(100, Math.ceil((maxData * 1.05) / 5) * 5); 
+    }
+    
+    const ctx1 = document.getElementById('overallChart').getContext('2d');
+    if (overallChartInstance) overallChartInstance.destroy(); 
+    overallChartInstance = new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: monthNames,
+            datasets: [{
+                label: 'Rata-rata Kinerja (Semua Pegawai)',
+                data: monthlyAvgs,
+                borderColor: '#007bff',
+                backgroundColor: 'rgba(0, 123, 255, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true, max: chartMax, title: { display: true, text: 'Skor' } } }
+        }
+    });
+
+    const ctx2 = document.getElementById('divisionChart').getContext('2d');
+    if (divisionChartInstance) divisionChartInstance.destroy();
+    const barColors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#009688', '#FF5722']; 
+    divisionChartInstance = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+            labels: divisions,
+            datasets: [{
+                label: 'Rata-rata Skor',
+                data: divAvgs,
+                backgroundColor: barColors,
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { y: { beginAtZero: true, max: chartMax } },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+function changePage(delta) {
+    const totalPages = Math.ceil(filteredData.length / ROWS_PER_PAGE);
+    const newPage = currentPage + delta;
+
+    if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        renderTable(); 
+        window.scrollTo({ top: document.querySelector('table').offsetTop - 20, behavior: 'smooth' });
+    }
+}
+
+function renderTable() {
+    const startIndex = (currentPage - 1) * ROWS_PER_PAGE;
+    const endIndex = startIndex + ROWS_PER_PAGE;
+    const dataToDisplay = filteredData.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(filteredData.length / ROWS_PER_PAGE);
+
+    $('dataBody').innerHTML = '';
+    
+    if (dataToDisplay.length === 0 && filteredData.length === 0) {
+        $('dataBody').innerHTML = `<tr><td colspan="8" style="text-align:center; color: #dc3545;">Tidak ada data yang cocok dengan kriteria pencarian.</td></tr>`;
+    } else {
+        dataToDisplay.forEach((d, i)=>{
+            const displayMonth = monthNames[parseInt(d.month) - 1]; 
+            
+            $('dataBody').innerHTML += `
+                <tr>
+                    <td>${i + startIndex + 1}</td> <td>${d.name}</td>
+                    <td>${d.division || '-'}</td> <td>${displayMonth}</td>
+                    <td>${d.year}</td>
+                    <td style="text-align: right;">${d.tc_raw || '-'}</td>
+                    <td style="text-align: right;">${formatRupiah(d.tv_raw || 0)}</td>
+                    <td>${d.finalScore}</td>
+                    <td></td> </tr>`;
+        });
+    }
+
+    const prevButton = $('prevPage');
+    const nextButton = $('nextPage');
+    const pageInfo = $('pageInfo');
+    
+    if (filteredData.length > ROWS_PER_PAGE) {
+        prevButton.style.display = 'inline-block';
+        nextButton.style.display = 'inline-block';
+
+        prevButton.disabled = currentPage === 1;
+        nextButton.disabled = currentPage === totalPages;
+
+        prevButton.style.backgroundColor = currentPage === 1 ? '#ccc' : '#007bff';
+        nextButton.style.backgroundColor = currentPage === totalPages ? '#ccc' : '#007bff';
+
+        pageInfo.textContent = `Halaman ${currentPage} dari ${totalPages} (${filteredData.length} data)`;
+    } else {
+        prevButton.style.display = 'none';
+        nextButton.style.display = 'none';
+        pageInfo.textContent = filteredData.length > 0 ? `Total ${filteredData.length} data` : '';
+    }
+}
+
+
+function render(){
+    fetchData();
+    populateNameDropdowns();
+    updateCharts(); 
+
+    const searchQuery = $('searchName').value.toLowerCase();
+    const searchDivision = $('searchDivision').value; 
+    const searchMonth = $('searchMonth').value;
+    const searchYear = $('searchYear').value;
+
+    filteredData = db.filter(d => {
+        const nameMatch = searchQuery === '' || (d.name && d.name.toLowerCase().includes(searchQuery));
+        const divisionMatch = searchDivision === '' || d.division === searchDivision; 
+        const monthMatch = searchMonth === '' || d.month.toString() === searchMonth;
+        const yearMatch = searchYear === '' || d.year.toString() === searchYear;
+
+        return nameMatch && divisionMatch && monthMatch && yearMatch;
+    });
+    
+    currentPage = 1;
+    renderTable();
+}
+
+// --- FUNGSI EXPORT (Sama seperti index.html) ---
+
+function workbookToS2ab(workbook) {
+    const wopts = { bookType: 'xlsx', bookSST: false, type: 'binary' };
+    const ws = XLSX.write(workbook, wopts);
+    function s2ab(s) {
+        const buf = new ArrayBuffer(s.length);
+        const view = new Uint8Array(buf);
+        for (let i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+        return buf;
+    }
+    return new Blob([s2ab(ws)], { type: 'application/octet-stream' });
+}
+
+function exportDataToExcel(data, filename) {
+    if (typeof XLSX === 'undefined') {
+        alert("Gagal export. Pastikan library XLSX.js telah dimuat.");
+        return;
+    }
+
+    const exportData = data.map((d, index) => ({
+        'No.': index + 1,
+        'Nama Pegawai': d.name,
+        'Divisi': d.division || '-',
+        'Bulan': monthNames[parseInt(d.month) - 1],
+        'Tahun': d.year,
+        'Jml. Pekerjaan': d.tc_raw || '-',
+        'Nominal Pekerjaan (Rp)': d.tv_raw || 0,
+        'Skor Akhir': d.finalScore
+    }));
+    
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Kinerja');
+    
+    const blob = workbookToS2ab(workbook);
+    saveAs(blob, filename + '.xlsx');
+}
+
+function saveAs(blob, filename) {
+    const a = document.createElement('a');
+    a.href = window.URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(a.href);
+}
+
+function exportAllDataToExcel() {
+    exportDataToExcel(db, 'Laporan_Kinerja_All');
+}
+
+function exportFilteredDataToExcel() {
+    exportDataToExcel(filteredData, 'Data_Tersimpan_Filtered');
+}
+
+function exportToPDF(data, filename, isDashboard) {
+    alert("Fungsi Export PDF memerlukan implementasi lanjutan jspdf-autotable.");
+}
+function printElement(elementId, title) {
+    window.print();
+}
+
+// Initial Render
+document.addEventListener('DOMContentLoaded', () => {
+    initDropdowns();
+    render(); 
+});
+</script>
+</body>
+</html>
