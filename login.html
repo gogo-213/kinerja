@@ -136,21 +136,10 @@ body {
 const ADMIN_APP_URL = 'index.html';
 const USER_APP_URL = 'user.html';
 
-// ⚠️ KONFIGURASI ADMIN & USER
-const ADMIN_CREDENTIALS = [
-    { nip: '197906192010121002', pin: '112244' },                   // Admin 1 (Contoh Singkat)
-    { nip: '198710312010122002', pin: '093346' }     // Admin 2
-];
-// Untuk USER, hanya perlu PIN dan NIP untuk otentikasi.
-// Semua NIP/PIN selain yang ada di ADMIN_CREDENTIALS akan dianggap sebagai USER.
-const USER_CREDENTIALS = [
-    { nip: '198210092010122002', pin: '123456' }, // Contoh user 1
-    { nip: '2345678', pin: '234567' }  // Contoh user 2
-];
-
+// ⚠️ WAJIB DIGANTI! GANTI DENGAN URL WEB APP APPS SCRIPT ANDA
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzzzz/exec'; 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Redirect jika status login sudah ada
     if (localStorage.getItem('isAdminLoggedIn') === 'true') {
         window.location.href = ADMIN_APP_URL;
     } else if (localStorage.getItem('isUserLoggedIn') === 'true') {
@@ -181,41 +170,64 @@ function handleLogin(role) {
     }
 
     setButtonState(true, 'Memverifikasi...');
-    message.textContent = '';
+    message.textContent = 'Memverifikasi...';
+    message.style.color = '#007bff';
 
-    // Cek otentikasi
-    const isAdmin = ADMIN_CREDENTIALS.some(admin => admin.nip === nip && admin.pin === pin);
-    const isUser = USER_CREDENTIALS.some(user => user.nip === nip && user.pin === pin);
+    const url = `${APPS_SCRIPT_URL}?nip=${encodeURIComponent(nip)}&pin=${encodeURIComponent(pin)}`;
 
-    let redirectURL = null;
-    let loginKey = null;
+    fetch(url)
+        .then(response => {
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                return response.json();
+            } else {
+                // Apps Script sering mengirim HTML/teks error jika terjadi masalah
+                throw new Error('Gagal terhubung ke Apps Script atau respon tidak valid.');
+            }
+        })
+        .then(data => {
+            if (data.success) {
+                let redirectURL = null;
+                let loginKey = null;
 
-    if (role === 'admin' && isAdmin) {
-        redirectURL = ADMIN_APP_URL;
-        loginKey = 'isAdminLoggedIn';
-    } else if (role === 'user' && (isAdmin || isUser)) { // Admin juga bisa login sebagai user
-        redirectURL = USER_APP_URL;
-        loginKey = 'isUserLoggedIn';
-    }
+                // Jika tombol Admin diklik DAN peran yang dikembalikan adalah admin
+                if (role === 'admin' && data.role === 'admin') {
+                    redirectURL = ADMIN_APP_URL;
+                    loginKey = 'isAdminLoggedIn';
+                } 
+                // Jika tombol User diklik DAN peran yang dikembalikan adalah admin atau user
+                else if (role === 'user' && (data.role === 'admin' || data.role === 'user')) {
+                    redirectURL = USER_APP_URL;
+                    loginKey = 'isUserLoggedIn';
+                } else {
+                    message.textContent = 'Anda tidak memiliki hak akses yang diminta.';
+                }
 
-    if (redirectURL) {
-        message.textContent = 'Login Berhasil! Mengarahkan...';
-        message.style.color = '#28a745';
-        
-        // Bersihkan status login lain dan simpan status baru
-        localStorage.removeItem('isAdminLoggedIn');
-        localStorage.removeItem('isUserLoggedIn');
-        localStorage.setItem(loginKey, 'true'); 
-        
-        setTimeout(() => {
-            window.location.href = redirectURL; 
-        }, 1000);
+                if (redirectURL) {
+                    message.textContent = 'Login Berhasil! Mengarahkan...';
+                    message.style.color = '#28a745';
+                    localStorage.removeItem('isAdminLoggedIn');
+                    localStorage.removeItem('isUserLoggedIn');
+                    localStorage.setItem(loginKey, 'true');
+                    setTimeout(() => {
+                        window.location.href = redirectURL;
+                    }, 1000);
+                    return;
+                }
 
-    } else {
-        message.textContent = 'NIP atau PIN salah atau tidak memiliki hak akses yang diminta.';
-        message.style.color = '#dc3545';
-        setButtonState(false);
-    }
+            } else {
+                message.textContent = 'NIP atau PIN salah.';
+            }
+            
+            message.style.color = '#dc3545';
+            setButtonState(false);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            message.textContent = 'Gagal terhubung ke server verifikasi. Cek koneksi & URL Apps Script.';
+            message.style.color = '#dc3545';
+            setButtonState(false);
+        });
 }
 </script>
 </body>
