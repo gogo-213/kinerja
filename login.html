@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Login - Aplikasi Penilaian Kinerja</title>
 <style>
-/* --- KODE CSS LAMA UNTUK LOGIN TETAP SAMA DI SINI --- */
+/* --- CSS LOGIN --- */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); 
@@ -101,6 +101,7 @@ body {
     color: #888;
     font-size: 0.85em;
 }
+/* --- AKHIR CSS LOGIN --- */
 </style>
 </head>
 <body>
@@ -135,11 +136,10 @@ body {
 const ADMIN_APP_URL = 'index.html';
 const USER_APP_URL = 'user.html';
 
-// ⚠️ GANTI DENGAN URL WEB APP APPS SCRIPT ANDA DARI LANGKAH 1
+// ⚠️ WAJIB DIGANTI! GANTI DENGAN URL WEB APP APPS SCRIPT ANDA
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzzzz/exec'; 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Redirect jika status login sudah ada
     if (localStorage.getItem('isAdminLoggedIn') === 'true') {
         window.location.href = ADMIN_APP_URL;
     } else if (localStorage.getItem('isUserLoggedIn') === 'true') {
@@ -173,17 +173,15 @@ function handleLogin(role) {
     message.textContent = 'Memverifikasi...';
     message.style.color = '#007bff';
 
-    // Buat URL yang mengirim NIP dan PIN ke Apps Script
     const url = `${APPS_SCRIPT_URL}?nip=${encodeURIComponent(nip)}&pin=${encodeURIComponent(pin)}`;
 
     fetch(url)
         .then(response => {
-            // Pastikan respon adalah JSON sebelum mencoba parse
             const contentType = response.headers.get("content-type");
             if (contentType && contentType.indexOf("application/json") !== -1) {
                 return response.json();
             } else {
-                // Jika bukan JSON (misalnya error Apps Script), tangani sebagai error
+                // Apps Script sering mengirim HTML/teks error jika terjadi masalah
                 throw new Error('Gagal terhubung ke Apps Script atau respon tidak valid.');
             }
         })
@@ -192,12 +190,12 @@ function handleLogin(role) {
                 let redirectURL = null;
                 let loginKey = null;
 
-                // Admin Button clicked: Hanya diizinkan jika server membalas dengan role 'admin'
+                // Jika tombol Admin diklik DAN peran yang dikembalikan adalah admin
                 if (role === 'admin' && data.role === 'admin') {
                     redirectURL = ADMIN_APP_URL;
                     loginKey = 'isAdminLoggedIn';
                 } 
-                // User Button clicked: Diizinkan jika server membalas 'admin' atau 'user'
+                // Jika tombol User diklik DAN peran yang dikembalikan adalah admin atau user
                 else if (role === 'user' && (data.role === 'admin' || data.role === 'user')) {
                     redirectURL = USER_APP_URL;
                     loginKey = 'isUserLoggedIn';
@@ -208,10 +206,8 @@ function handleLogin(role) {
                 if (redirectURL) {
                     message.textContent = 'Login Berhasil! Mengarahkan...';
                     message.style.color = '#28a745';
-                    // Bersihkan status login lama
                     localStorage.removeItem('isAdminLoggedIn');
                     localStorage.removeItem('isUserLoggedIn');
-                    // Set status login baru
                     localStorage.setItem(loginKey, 'true');
                     setTimeout(() => {
                         window.location.href = redirectURL;
