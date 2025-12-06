@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login Admin - Aplikasi Penilaian Kinerja</title>
+<style>
+/* --- CSS LOGIN --- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); 
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+.login-container {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px; 
+    text-align: center;
+}
+.login-header {
+    margin-bottom: 30px;
+}
+.login-header h2 {
+    color: #007bff;
+    margin: 0;
+    font-size: 2em;
+}
+.login-header p {
+    color: #555;
+    margin-top: 5px;
+    font-size: 1em;
+}
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+}
+.input-group input[type="text"],
+.input-group input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.input-group input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    outline: none;
+}
+#loginButton {
+    width: 100%;
+    padding: 14px;
+    background-color: #28a745; 
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+#loginButton:hover {
+    background-color: #1e7e34;
+}
+#loginButton:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+#message {
+    margin-top: 15px;
+    color: #dc3545;
+    font-weight: 600;
+    min-height: 20px;
+}
+.login-footer {
+    margin-top: 30px;
+    color: #888;
+    font-size: 0.85em;
+}
+/* --- AKHIR CSS LOGIN --- */
+</style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="login-header">
+        <h2>Administrator Login 🔑</h2>
+        <p>Aplikasi Penilaian Kinerja Pegawai BP2JK DIY</p>
+    </div>
+
+    <form id="loginForm" onsubmit="event.preventDefault(); handleLogin();">
+        <div class="input-group">
+            <label for="nip">NIP (Nomor Induk Pegawai):</label>
+            <input type="text" id="nip" placeholder="Masukkan NIP Anda" required />
+        </div>
+        <div class="input-group">
+            <label for="pin">PIN:</label>
+            <input type="password" id="pin" placeholder="Masukkan PIN Anda" required />
+        </div>
+        
+        <button type="submit" id="loginButton">Masuk</button>
+        <div id="message"></div>
+    </form>
+
+    <div class="login-footer">
+        Harap hubungi Administrator Sistem jika mengalami masalah.
+    </div>
+</div>
+
+<script>
+const MAIN_APP_URL = 'index.html';
+
+// ⚠️ KONFIGURASI ADMIN: Anda bisa menambahkan admin sebanyak yang diperlukan di array ini.
+const ADMIN_CREDENTIALS = [
+    { nip: '123456', pin: '1122' },                   // Admin 1 (Contoh Singkat)
+    { nip: '198710312010122002', pin: '093346' }     // Admin 2 (NIP/PIN Pilihan Anda)
+];
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Jika sudah login, langsung redirect ke aplikasi utama
+    if (localStorage.getItem('isAdminLoggedIn') === 'true') {
+        window.location.href = MAIN_APP_URL;
+    }
+});
+
+function handleLogin() {
+    const nip = document.getElementById('nip').value.trim();
+    const pin = document.getElementById('pin').value.trim();
+    const loginButton = document.getElementById('loginButton');
+    const message = document.getElementById('message');
+
+    if (!nip || !pin) {
+        message.textContent = 'NIP dan PIN harus diisi.';
+        return;
+    }
+
+    loginButton.disabled = true;
+    loginButton.textContent = 'Memverifikasi...';
+    message.textContent = '';
+
+    // Cek apakah NIP dan PIN yang dimasukkan cocok dengan salah satu admin di daftar
+    const isAuthenticated = ADMIN_CREDENTIALS.some(admin => {
+        return admin.nip === nip && admin.pin === pin;
+    });
+
+    if (isAuthenticated) {
+        message.textContent = 'Login Berhasil! Mengarahkan ke Dashboard...';
+        message.style.color = '#28a745';
+        
+        // Simpan status login di LocalStorage
+        localStorage.setItem('isAdminLoggedIn', 'true'); 
+        
+        setTimeout(() => {
+            window.location.href = MAIN_APP_URL; // Arahkan ke halaman utama
+        }, 1000);
+
+    } else {
+        message.textContent = 'NIP atau PIN salah. Silakan coba lagi.';
+        message.style.color = '#dc3545';
+    }
+
+    loginButton.disabled = false;
+    loginButton.textContent = 'Masuk';
+}
+</script>
+</body>
+</html>
