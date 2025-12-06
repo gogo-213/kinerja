@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Login Admin - Aplikasi Penilaian Kinerja</title>
+<title>Login - Aplikasi Penilaian Kinerja</title>
 <style>
 /* --- CSS LOGIN --- */
 body {
@@ -62,10 +62,9 @@ body {
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
     outline: none;
 }
-#loginButton {
+#loginAdminButton, #loginUserButton {
     width: 100%;
     padding: 14px;
-    background-color: #28a745; 
     color: white;
     border: none;
     border-radius: 6px;
@@ -73,11 +72,21 @@ body {
     font-size: 1.1em;
     font-weight: bold;
     transition: background-color 0.3s;
+    margin-top: 10px;
 }
-#loginButton:hover {
+#loginAdminButton {
+    background-color: #007bff; 
+}
+#loginAdminButton:hover {
+    background-color: #0056b3;
+}
+#loginUserButton {
+    background-color: #28a745; 
+}
+#loginUserButton:hover {
     background-color: #1e7e34;
 }
-#loginButton:disabled {
+#loginAdminButton:disabled, #loginUserButton:disabled {
     background-color: #ccc;
     cursor: not-allowed;
 }
@@ -99,11 +108,11 @@ body {
 
 <div class="login-container">
     <div class="login-header">
-        <h2>Administrator Login 🔑</h2>
-        <p>Aplikasi Penilaian Kinerja Pegawai BP2JK DIY</p>
+        <h2>Login Aplikasi Kinerja 🔑</h2>
+        <p>Balai Pelaksana Pemilihan Jasa Konstruksi (BP2JK) DIY</p>
     </div>
 
-    <form id="loginForm" onsubmit="event.preventDefault(); handleLogin();">
+    <form id="loginForm" onsubmit="event.preventDefault();">
         <div class="input-group">
             <label for="nip">NIP (Nomor Induk Pegawai):</label>
             <input type="text" id="nip" placeholder="Masukkan NIP Anda" required />
@@ -113,7 +122,8 @@ body {
             <input type="password" id="pin" placeholder="Masukkan PIN Anda" required />
         </div>
         
-        <button type="submit" id="loginButton">Masuk</button>
+        <button type="button" id="loginAdminButton" onclick="handleLogin('admin')">Masuk sebagai Administrator</button>
+        <button type="button" id="loginUserButton" onclick="handleLogin('user')">Lihat Dashboard (User)</button>
         <div id="message"></div>
     </form>
 
@@ -123,26 +133,46 @@ body {
 </div>
 
 <script>
-const MAIN_APP_URL = 'index.html';
+const ADMIN_APP_URL = 'index.html';
+const USER_APP_URL = 'user.html';
 
-// ⚠️ KONFIGURASI ADMIN: Anda bisa menambahkan admin sebanyak yang diperlukan di array ini.
+// ⚠️ KONFIGURASI ADMIN & USER
 const ADMIN_CREDENTIALS = [
     { nip: '123456', pin: '1122' },                   // Admin 1 (Contoh Singkat)
-    { nip: '198710312010122002', pin: '093346' }     // Admin 2 (NIP/PIN Pilihan Anda)
+    { nip: '198710312010122002', pin: '093346' }     // Admin 2
+];
+// Untuk USER, hanya perlu PIN dan NIP untuk otentikasi.
+// Semua NIP/PIN selain yang ada di ADMIN_CREDENTIALS akan dianggap sebagai USER.
+const USER_CREDENTIALS = [
+    { nip: '777777', pin: '7777' }, // Contoh user 1
+    { nip: '888888', pin: '8888' }  // Contoh user 2
 ];
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Jika sudah login, langsung redirect ke aplikasi utama
+    // Redirect jika status login sudah ada
     if (localStorage.getItem('isAdminLoggedIn') === 'true') {
-        window.location.href = MAIN_APP_URL;
+        window.location.href = ADMIN_APP_URL;
+    } else if (localStorage.getItem('isUserLoggedIn') === 'true') {
+        window.location.href = USER_APP_URL;
     }
 });
 
-function handleLogin() {
+function setButtonState(disabled, text) {
+    document.getElementById('loginAdminButton').disabled = disabled;
+    document.getElementById('loginUserButton').disabled = disabled;
+    if (text) {
+        document.getElementById('loginAdminButton').textContent = text;
+        document.getElementById('loginUserButton').textContent = text;
+    } else {
+        document.getElementById('loginAdminButton').textContent = 'Masuk sebagai Administrator';
+        document.getElementById('loginUserButton').textContent = 'Lihat Dashboard (User)';
+    }
+}
+
+function handleLogin(role) {
     const nip = document.getElementById('nip').value.trim();
     const pin = document.getElementById('pin').value.trim();
-    const loginButton = document.getElementById('loginButton');
     const message = document.getElementById('message');
 
     if (!nip || !pin) {
@@ -150,33 +180,42 @@ function handleLogin() {
         return;
     }
 
-    loginButton.disabled = true;
-    loginButton.textContent = 'Memverifikasi...';
+    setButtonState(true, 'Memverifikasi...');
     message.textContent = '';
 
-    // Cek apakah NIP dan PIN yang dimasukkan cocok dengan salah satu admin di daftar
-    const isAuthenticated = ADMIN_CREDENTIALS.some(admin => {
-        return admin.nip === nip && admin.pin === pin;
-    });
+    // Cek otentikasi
+    const isAdmin = ADMIN_CREDENTIALS.some(admin => admin.nip === nip && admin.pin === pin);
+    const isUser = USER_CREDENTIALS.some(user => user.nip === nip && user.pin === pin);
 
-    if (isAuthenticated) {
-        message.textContent = 'Login Berhasil! Mengarahkan ke Dashboard...';
+    let redirectURL = null;
+    let loginKey = null;
+
+    if (role === 'admin' && isAdmin) {
+        redirectURL = ADMIN_APP_URL;
+        loginKey = 'isAdminLoggedIn';
+    } else if (role === 'user' && (isAdmin || isUser)) { // Admin juga bisa login sebagai user
+        redirectURL = USER_APP_URL;
+        loginKey = 'isUserLoggedIn';
+    }
+
+    if (redirectURL) {
+        message.textContent = 'Login Berhasil! Mengarahkan...';
         message.style.color = '#28a745';
         
-        // Simpan status login di LocalStorage
-        localStorage.setItem('isAdminLoggedIn', 'true'); 
+        // Bersihkan status login lain dan simpan status baru
+        localStorage.removeItem('isAdminLoggedIn');
+        localStorage.removeItem('isUserLoggedIn');
+        localStorage.setItem(loginKey, 'true'); 
         
         setTimeout(() => {
-            window.location.href = MAIN_APP_URL; // Arahkan ke halaman utama
+            window.location.href = redirectURL; 
         }, 1000);
 
     } else {
-        message.textContent = 'NIP atau PIN salah. Silakan coba lagi.';
+        message.textContent = 'NIP atau PIN salah atau tidak memiliki hak akses yang diminta.';
         message.style.color = '#dc3545';
+        setButtonState(false);
     }
-
-    loginButton.disabled = false;
-    loginButton.textContent = 'Masuk';
 }
 </script>
 </body>
